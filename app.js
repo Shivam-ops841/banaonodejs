@@ -1,17 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const userRouter = require('./routes/Route');
+const appRoutes = require('./routes/appRoutes');
 
 const app = express();
 
+// Middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/banaonodejs');
-const db = mongoose.connection;
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/social_media')
+    .then(() => {
+        console.log('Connected to MongoDB');
+        // Start the server after successfully connecting to the database
+        app.listen(3000, () => {
+            console.log('Server is running on port 3000');
+        });
+    })
+    .catch(err => console.error('Could not connect to MongoDB', err));
 
-app.use('/api/user', userRouter);
+// Routes
+app.use('/api/v2', appRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+module.exports = app;
